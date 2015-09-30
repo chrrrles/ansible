@@ -189,4 +189,7 @@ test_galaxy_yaml:
     exit $$RC
 
 test_lookup_paths:
-	ansible-playbook lookup_paths/play.yml -i $(INVENTORY) -v $(TEST_FLAGS)
+	ansible-playbook lookup_paths/play.yml -i $(INVENTORY) -v $(TEST_FLAGS) ; \
+
+test_lvol_size_input:
+	ansible-playbook test_lvol_size_input.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -v $(TEST_FLAGS)

@@ -1,0 +1,116 @@
+---
+# (c) 2015, Charles Paul <cpaul@ansible.com>
+# (c) 2014, Richard Isaacson <richard.c.isaacson@gmail.com>
+
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+- set_fact: img=/tmp/lvol_loop.img
+
+- name: create loop image
+  command: dd if=/dev/zero of={{ img }} bs=1M count=100
+
+- name: find loop device
+  shell: losetup -f
+  register: loop
+
+- name: attach image to loop
+  command: losetup {{ loop.stdout }} {{ img }}
+
+- name: create LVM fs partition
+  raw: (echo n; echo p; echo; echo; echo; echo t; echo 8e; echo w) | fdisk {{ loop.stdout }}
+  ignore_errors: yes
+
+- name: create LVM physical volume
+  shell: pvcreate -f {{ loop.stdout }}
+
+- name: delete test volume group
+  shell: vgremove -f test
+  ignore_errors: yes
+
+- name: create volume group
+  lvg: vg=test pvs={{ loop.stdout }} force=yes pesize=2
+
+- name: create logical volume with a float value and a unit
+  lvol: vg=test lv=test size=0.046G force=yes state=present
+
+- name: find size of test volume
+  shell: lvdisplay test
+  register: lv
+
+# [XXX] Need to verify that 0.46G will result in 48 MiB everywhere
+- name: Verify that LV Size is 48.00 MiB
+  assert:
+    that:
+      - "'LV Size                48.00 MiB' in lv.stdout"
+
+- name: delete test volume
+  shell: lvremove -f test
+
+- name: create logical volume with an integer value
+  lvol: vg=test lv=test size=82 force=yes state=present
+
+- name: find size of test volume
+  shell: lvdisplay test
+  register: lv
+
+- name: Verify that LV Size is 82.00 MiB
+  assert:
+    that:
+      - "'LV Size                82.00 MiB' in lv.stdout"
+
+- name: delete test volume
+  shell: lvremove -f test
+
+- name: create logical volume with an integer value and a unit
+  lvol: vg=test lv=test size=40M force=yes state=present
+
+- name: find size of test volume
+  shell: lvdisplay test
+  register: lv
+
+- name: Verify that LV Size is 40.00 MiB
+  assert:
+    that:
+      - "'LV Size                40.00 MiB' in lv.stdout"
+
+- name: delete test volume
+  shell: lvremove -f test
+
+- name: create logical volume with a percentage unit
+  lvol: vg=test lv=test size=98%FREE force=yes state=present
+
+- name: find size of test volume
+  shell: lvdisplay test
+  register: lv
+
+- name: Assert that LV Size is 96.00 MiB
+  assert:
+    that:
+      - "'LV Size                96.00 MiB' in lv.stdout"
+
+- name: remove test volume group
+  shell: vgremove -f test
+  ignore_errors: yes
+
+- name: remove test physical volume
+  shell: pvremove -f test
+  ignore_errors: yes
+
+- name: remove loopback device
+  shell: losetup -d {{ loop.stdout }}
+
+- name: remove loopback file
+  file: path={{ img }} state=absent
