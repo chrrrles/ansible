@@ -158,6 +158,16 @@ cloudstack:
 	RC=$$? ; \
 	exit $$RC;
 
+vmware:
+	ansible-playbook vmware.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -e "resource_prefix=$(CLOUD_RESOURCE_PREFIX)" -v $(TEST_FLAGS) ; \
+	RC=$$? ;\
+	exit $$RC;
+
+vca:
+	ansible-playbook vca.yml -i $(INVENTORY) -e @$(VARS_FILE) $(CREDENTIALS_ARG) -e "resource_prefix=$(CLOUD_RESOURCE_PREFIX)" -v $(TEST_FLAGS) ; \
+	RC=$$? ;\
+	exit $$RC;
+
 $(CONSUL_RUNNING):
 
 consul:

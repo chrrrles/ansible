@@ -1,0 +1,20 @@
+- hosts: vmware
+  gather_facts: true
+  roles:
+    - { role: test_vsphere_guest, tags: test_vsphere_guest }
+    - { role: test_vmware_cluster, tags: test_vmware_cluster }
+    - { role: test_vmware_datacenter, tags: test_vmware_datacenter }
+    - { role: test_vmware_dns_config, tags: test_vmware_dns_config }
+    - { role: test_vmware_dvs_host, tags: test_vmware_dvs_host }
+    - { role: test_vmware_dvs_portgroup, tags: test_vmware_dvs_portgroup }
+    - { role: test_vmware_dvswitch, tags: test_vmware_dvswitch }
+    - { role: test_vmware_host, tags: test_vmware_host }
+    - { role: test_vmware_migrate_vmk, tags: test_vmware_migrate_vmk }
+    - { role: test_vmware_portgroup, tags: test_vmware_portgroup }
+    - { role: test_vmware_target_canonical_facts, tags: test_vmware_target_canonical_facts }
+    - { role: test_vmware_vm_facts, tags: test_vmware_vm_facts }
+    - { role: test_vmware_vmkernel_ip_config, tags: test_vmware_ip_config }
+    - { role: test_vmware_vmkernel, tags: test_vmware_vmkernel }
+    - { role: test_vmware_vm_vss_dvs_migrate, tags: test_vmware_vm_vss_dvs_migrate }
+    - { role: test_vmware_vsan_cluster, tags: test_vmware_vsan_cluster }
+    - { role: test_vmware_vswitch, tags: test_vmware_vswitch }

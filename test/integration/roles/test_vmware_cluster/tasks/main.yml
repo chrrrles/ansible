@@ -1,0 +1,9 @@
+- name: test with no credentials
+  vmware_cluster:
+  register: result
+  ignore_errors: true
+
+- name: assert failure when called with no credentials
+  assert:
+    that:
+       - 'result.failed'

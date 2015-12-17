@@ -1,0 +1,5 @@
+---
+# defaults file for vmware roles
+username: "{{ vmware_username|default('ansible_user') }}"
+host: "{{ vmware_host|default('localhost') }}"
+password: "{{ vmware_password|default('abc123Q%') }}"
